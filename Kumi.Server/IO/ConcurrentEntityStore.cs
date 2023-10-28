@@ -76,7 +76,7 @@ public partial class ConcurrentEntityStore<TKey, TValue>
         
         throw new TimeoutException($"Could not retrieve entity {key} in time.");
     }
-    
+
     public void Create(TKey key, TValue? value = null)
     {
         lock (_items)
@@ -101,7 +101,7 @@ public partial class ConcurrentEntityStore<TKey, TValue>
             }
         }
     }
-    
+
     public void Remove(TKey key)
     {
         lock (_items)
@@ -111,6 +111,19 @@ public partial class ConcurrentEntityStore<TKey, TValue>
                 entity.Dispose();
                 _items.TryRemove(key, out _);
             }
+        }
+    }
+
+    public void Clear()
+    {
+        lock (_items)
+        {
+            foreach (var (_, entity) in _items)
+            {
+                entity.Dispose();
+            }
+            
+            _items.Clear();
         }
     }
 

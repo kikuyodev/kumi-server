@@ -3,13 +3,15 @@ using NUnit.Framework;
 
 namespace Kumi.Server.Tests.IO;
 
+[TestFixture]
 public class ConcurrentEntityStoreTest
 {
-    private readonly ConcurrentEntityStore<int, TestEntity> store;
-    
-    public ConcurrentEntityStoreTest()
+    private readonly ConcurrentEntityStore<int, TestEntity> store = new ConcurrentEntityStore<int, TestEntity>();
+
+    [TearDown]
+    public void Teardown()
     {
-        store = new ConcurrentEntityStore<int, TestEntity>();
+        store.Clear();
     }
 
     [Test]
