@@ -1,0 +1,27 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+#
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kumi.Server", "Kumi.Server\Kumi.Server.csproj", "{1BC0AAD8-DDD6-4AB8-8290-ED6E49A5E755}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kumi.Server.Tests", "Kumi.Server.Tests\Kumi.Server.Tests.csproj", "{0945AF88-358A-452F-8A76-A9B181906B3F}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{1BC0AAD8-DDD6-4AB8-8290-ED6E49A5E755}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1BC0AAD8-DDD6-4AB8-8290-ED6E49A5E755}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1BC0AAD8-DDD6-4AB8-8290-ED6E49A5E755}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1BC0AAD8-DDD6-4AB8-8290-ED6E49A5E755}.Release|Any CPU.Build.0 = Release|Any CPU
+		{51359335-6C4C-40B4-864E-A7F289EA9915}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{51359335-6C4C-40B4-864E-A7F289EA9915}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{51359335-6C4C-40B4-864E-A7F289EA9915}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{51359335-6C4C-40B4-864E-A7F289EA9915}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0945AF88-358A-452F-8A76-A9B181906B3F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0945AF88-358A-452F-8A76-A9B181906B3F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0945AF88-358A-452F-8A76-A9B181906B3F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0945AF88-358A-452F-8A76-A9B181906B3F}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
