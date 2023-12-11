@@ -8,10 +8,19 @@ namespace Kumi.Server.Processing;
 public class QueueItem<T> : QueueItem
     where T : notnull
 {
+    public new T Data
+    {
+        get => (T)base.Data!;
+        set => base.Data = value;
+    }
+}
+
+public class QueueItem
+{
     /// <summary>
     /// The data associated with this queue item.
     /// </summary>
-    public T? Data { get; set; }
+    public object? Data { get; set; }
     
     /// <summary>
     /// The queue processor that this item belongs to.
@@ -19,10 +28,5 @@ public class QueueItem<T> : QueueItem
     [JsonIgnore]
     public QueueProcessor? Processor { get; set; } = null!;
 
-    public override string ToString() => JsonConvert.SerializeObject(this.Data);
-}
-
-public class QueueItem
-{
-    
+    public override string ToString() => JsonConvert.SerializeObject(Data);
 }

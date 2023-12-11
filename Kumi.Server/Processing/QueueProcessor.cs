@@ -44,7 +44,7 @@ public abstract partial class QueueProcessor : IDependencyInjectionCandidate
             throw new ArgumentException("Queue name does not exist.", nameof(queueName));
         
         var db = Connection.GetDatabase();
-        db.ListLeftPush(resolveQueueName(queueName), item);
+        db.ListRightPush(resolveQueueName(queueName), item);
     }
     
     public void ClearQueue(string queueName)

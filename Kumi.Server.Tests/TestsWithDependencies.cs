@@ -9,20 +9,20 @@ public class TestsWithDependencies
     /// <summary>
     /// The dependencies across the entire branch of unit tests..
     /// </summary>
-    public DependencyContainer Dependencies { get; set; } = new();
+    protected DependencyContainer Dependencies { get; set; } = new();
     
-    bool _setup = false;
+    private bool setup = false;
     
-    [SetUp]
+    [OneTimeSetUp]
     public void Setup()
     {
-        if (_setup)
+        if (setup)
         {
             SetupBeforeTest();
             return;
         }
 
-        _setup = true;
+        setup = true;
         Dependencies.CacheAs(this);
         Dependencies.CacheAs(new RedisConnection());
         
