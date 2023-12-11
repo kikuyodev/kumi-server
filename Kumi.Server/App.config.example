@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<configuration>
+    <appSettings>
+        <add key="database:host" value="localhost" />
+        <add key="database:port" value="3306" />
+        <add key="database:username" value="postgres" />
+        <add key="database:password" value="" />
+    </appSettings>
+</configuration>

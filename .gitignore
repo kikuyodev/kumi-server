@@ -1,4 +1,4 @@
-﻿# .gitignore
+# .gitignore
 # Ignores files that are not needed for the project, including IDE files, build files, and the virtual environment.
 
 # User-specific files
@@ -7,6 +7,7 @@
 *.user
 *.userosscache
 *.sln.docstates
+*.config
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
