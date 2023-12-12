@@ -1,5 +1,6 @@
 using System.Reflection;
 using Kumi.Server.Redis;
+using Kumi.Server.WebSockets;
 using Newtonsoft.Json;
 using osu.Framework.Allocation;
 using StackExchange.Redis;
@@ -25,6 +26,13 @@ public abstract partial class QueueProcessor : IDependencyInjectionCandidate
 
     [Resolved]
     private RedisConnection redis { get; set; } = null!;
+    
+    /// <summary>
+    /// The websocket server.
+    /// This must be here, because it won't be resolved in any child classes.
+    /// </summary>
+    [Resolved]
+    protected WebsocketServer WebsocketServer { get; private set; } = null!;
 
     /// <summary>
     /// Pre-processes an item from the queue.
@@ -82,7 +90,7 @@ public abstract partial class QueueProcessor : IDependencyInjectionCandidate
         var paramType = queue.Item2.GetParameters().First().ParameterType;
         
         // Construct the base queue item.
-        var queueItem = Activator.CreateInstance(paramType);
+        var queueItem = (QueueItem)Activator.CreateInstance(paramType);
         
         // Deserialize the item into it's data.
         // Simply set the data with reflection.
@@ -90,6 +98,9 @@ public abstract partial class QueueProcessor : IDependencyInjectionCandidate
         var queueType = queueItem.GetType();
         var dataProperty = queueType.GetProperty("Data");
         var data = JsonConvert.DeserializeObject(item.ToString(), dataProperty.PropertyType);
+        
+        queueItem.Processor = this;
+        queueItem.Queue = queueName;
         
         // Set the data property.
         dataProperty.SetValue(queueItem, data);

@@ -14,7 +14,7 @@ public class HubAttribute : Attribute
     /// <summary>
     /// The dispatch type that this hub handles, if any.
     /// </summary>
-    public DispatchType? DispatchType { get; }
+    public string? DispatchType { get; }
     
     /// <summary>
     /// Whether this hub expects data.
@@ -26,7 +26,7 @@ public class HubAttribute : Attribute
         OpCode = opCode;
     }
 
-    public HubAttribute(OpCode opCode, DispatchType dispatchType)
+    public HubAttribute(OpCode opCode, string dispatchType)
     {
         OpCode = opCode;
         DispatchType = dispatchType;
@@ -38,7 +38,7 @@ public class HubAttribute : Attribute
         ExpectsData = expectsData;
     }
     
-    public HubAttribute(OpCode opCode, DispatchType dispatchType, bool expectsData)
+    public HubAttribute(OpCode opCode, string dispatchType, bool expectsData)
     {
         OpCode = opCode;
         DispatchType = dispatchType;

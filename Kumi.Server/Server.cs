@@ -17,6 +17,8 @@ public class Server
     public DependencyContainer Dependencies { get; set; } = new();
     
     public RedisConnection Redis { get; set; }
+    
+    public WebsocketServer WebsocketServer { get; set; } = null!;
 
     public void Run()
     {
@@ -25,7 +27,10 @@ public class Server
         Dependencies.CacheAs(Redis.Connection.GetDatabase());
         Dependencies.CacheAs(new DatabaseContext());
         
-        
+        // Start a websocket server.
+        Dependencies.CacheAs(WebsocketServer = new WebsocketServer(3403));
+        Dependencies.Inject(WebsocketServer);
+
         // Get all the queue processors.
         var queue_processors = Assembly.GetExecutingAssembly()
             .GetTypes()
@@ -64,11 +69,6 @@ public class Server
             thread.Start();
         }
         
-        // Start a websocket server.
-        var server = new WebsocketServer(3403); // temporary port
-        Dependencies.CacheAs(server);
-        Dependencies.Inject(server);
-        
-        server.Start();
+        WebsocketServer.Start();
     }
 }

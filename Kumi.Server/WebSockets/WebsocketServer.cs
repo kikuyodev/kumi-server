@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System.Linq.Expressions;
+using System.Net;
 using System.Net.Sockets;
 using System.Reflection;
 using System.Security.Cryptography;
@@ -137,6 +138,18 @@ public partial class WebsocketServer : IDependencyInjectionCandidate
             }));
 
             _connectionThreads[connection].Start();
+        }
+    }
+    
+    public Connection? GetConnection(string id) => GetConnection(Guid.Parse(id));
+    public Connection? GetConnection(Guid id) => Connections.FirstOrDefault(c => c.Id == id);
+    
+    public IEnumerable<Connection> GetConnections(Expression<Func<Connection, bool>> query)
+    {
+        foreach (var connection in Connections)
+        {
+            if (query.Compile()(connection))
+                yield return connection;
         }
     }
 
