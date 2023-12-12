@@ -1,7 +1,11 @@
 ﻿using System.Net.Sockets;
 using System.Security.Cryptography;
 using System.Text;
+using Kumi.Game.Extensions;
+using Kumi.Game.Online.Server;
+using Kumi.Game.Online.Server.Packets;
 using Kumi.Server.Database.Models;
+using Newtonsoft.Json;
 
 namespace Kumi.Server.WebSockets;
 
@@ -40,6 +44,40 @@ public class Connection : IDisposable
         Client = client;
     }
 
+    public void Send(Packet sendablePacket)
+    {
+        // Serialize the packet.
+        var serialized = JsonConvert.SerializeObject(sendablePacket);
+
+        using (var packet = new MemoryStream())
+        {
+            byte op = 0b0_0_0_0_0000;
+            op |= 0b1_0_0_0_0000; // FIN
+            op |= 0b0_0_0_0_0001; // Opcode (text)
+            
+            packet.WriteByte(op);
+            
+            var data = Encoding.UTF8.GetBytes(serialized);
+            packet.WriteByte((byte) data.Length);
+            packet.Write(data, 0, data.Length);
+            
+            // Send the packet.
+            Stream.Write(packet.ToArray(), 0, (int) packet.Length);
+        }
+    }
+
+    
+    private byte[] intToByteArray(ushort value)
+    {
+        var ary = BitConverter.GetBytes(value);
+        if (BitConverter.IsLittleEndian)
+        {
+            Array.Reverse(ary);
+        }
+
+        return ary;
+    }
+
     public void ValidateHandshake(string handshake)
     {
         // Get the key from the request.
@@ -56,6 +94,7 @@ public class Connection : IDisposable
                             
         // Start the WebSocket connection.
         this.Connected = true;
+        this.Send(new HelloPacket());
     }
 
     public string ProcessIncoming(byte[] buffer)

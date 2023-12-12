@@ -109,8 +109,29 @@ public partial class WebsocketServer : IDependencyInjectionCandidate
                             connection.Dispose();
                             return;
                         }
+                        
+                        // Get the websocket frame opcode.
+                        var opCode = buffer[0] & ((1 << 4) - 1);
 
-                        handleMessage(connection, connection.ProcessIncoming(buffer));
+                        switch (opCode)
+                        {
+                            case 0x0: // continuation frame, which we don't support sadly.
+                            case 0x2: // we don't support binary frames yet
+                            case 0x9:
+                            case 0xA:
+                                break;
+                            
+                            case 0x1:
+                                handleMessage(connection, connection.ProcessIncoming(buffer));
+                                break;
+                            
+                            case 0x8: // close connection
+                                connection.Dispose();
+                                return;
+                                
+                            default:
+                                break;
+                        }
                     }
                 }
             }));
@@ -162,6 +183,9 @@ public partial class WebsocketServer : IDependencyInjectionCandidate
             
             // Check if the hub expects data.
             hasData = hubType.GetCustomAttribute<HubAttribute>()?.ExpectsData ?? false;
+                
+            if (potentialHub.ExpectsData && packet["d"] == null)
+                continue;
             
             // Parse the packet into the generic type.
             packetObj = (Packet)packet.ToObject(wantedType);
