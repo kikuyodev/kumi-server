@@ -52,7 +52,7 @@ public partial class AuthenticationHub : Hub<IdentifyPacket>
             {
                 Target = conn.Id.ToString(),
                 AccountId = account.Id,
-                Message = "You have been connected to the server."
+                Message = "Welcome to Kumi! Enjoy your stay!"
             }
         }.ToString());
     }
