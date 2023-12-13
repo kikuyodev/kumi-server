@@ -31,7 +31,7 @@ public partial class AuthenticationHub : Hub<IdentifyPacket>
         if (position == -1)
             return;
         
-        //cache.ListRemove("kumi.server:tokens", packet.Data.Token);
+        cache.ListRemove("kumi.server:tokens", packet.Data.Token);
         var data = cache.StringGet($"kumi.server:tokens:{packet.Data.Token}");
         
         if (data.IsNullOrEmpty)
@@ -52,7 +52,7 @@ public partial class AuthenticationHub : Hub<IdentifyPacket>
             {
                 Target = conn.Id.ToString(),
                 AccountId = account.Id,
-                Message = "You have been connected to the server."
+                Message = "Welcome to Kumi! Enjoy your stay!"
             }
         }.ToString());
     }
