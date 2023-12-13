@@ -42,7 +42,7 @@ public class Server
             // Ignore abstract classes.
             if (qp.IsAbstract)
                 continue;
-            
+                
             var instance = (QueueProcessor)Activator.CreateInstance(qp);
             
             // Get every method that has the Queue attribute.
