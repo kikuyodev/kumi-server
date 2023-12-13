@@ -117,11 +117,11 @@ public partial class WebsocketServer : IDependencyInjectionCandidate
                         switch (opCode)
                         {
                             case 0x0: // continuation frame, which we don't support sadly.
-                            case 0x2: // we don't support binary frames yet
                             case 0x9:
                             case 0xA:
                                 break;
                             
+                            case 0x2: // maybe?
                             case 0x1:
                                 handleMessage(connection, connection.ProcessIncoming(buffer));
                                 break;
