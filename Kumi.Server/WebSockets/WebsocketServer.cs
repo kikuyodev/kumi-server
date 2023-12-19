@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
 using Kumi.Game.Online.Server;
+using Kumi.Server.IO;
 using Kumi.Server.WebSockets.Hubs;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -31,7 +32,7 @@ public partial class WebsocketServer : IDependencyInjectionCandidate
     /// <summary>
     /// The list of connections that are currently connected to the server.
     /// </summary>
-    public List<Connection> Connections => _connectionThreads.Keys.ToList();
+    public ConnectionList Connections => new ConnectionList(_connectionThreads.Keys.ToList());
 
     public WebsocketServer(int port)
     {
@@ -144,13 +145,9 @@ public partial class WebsocketServer : IDependencyInjectionCandidate
     public Connection? GetConnection(string id) => GetConnection(Guid.Parse(id));
     public Connection? GetConnection(Guid id) => Connections.FirstOrDefault(c => c.Id == id);
     
-    public IEnumerable<Connection> GetConnections(Expression<Func<Connection, bool>> query)
+    public IConnectionEnumerable GetConnections(Expression<Func<Connection, bool>> query)
     {
-        foreach (var connection in Connections)
-        {
-            if (query.Compile()(connection))
-                yield return connection;
-        }
+        return new ConnectionList(Connections.Where(query.Compile()));
     }
 
     private void handleMessage(Connection conn, string message)
