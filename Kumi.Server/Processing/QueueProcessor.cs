@@ -39,7 +39,7 @@ public abstract partial class QueueProcessor : IDependencyInjectionCandidate
     /// The PostgreSQL database context.
     /// </summary>
     [Resolved]
-    protected DatabaseContext Database { get; set; }
+    protected DatabaseContext Database { get; private set; } = null!;
 
     /// <summary>
     /// Pre-processes an item from the queue.
