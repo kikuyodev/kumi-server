@@ -118,11 +118,11 @@ public partial class WebsocketServer : IDependencyInjectionCandidate
                         switch (opCode)
                         {
                             case 0x0: // continuation frame, which we don't support sadly.
-                            case 0x2: // we don't support binary frames yet
                             case 0x9:
                             case 0xA:
                                 break;
                             
+                            case 0x2: // maybe?
                             case 0x1:
                                 handleMessage(connection, connection.ProcessIncoming(buffer));
                                 break;
@@ -152,81 +152,90 @@ public partial class WebsocketServer : IDependencyInjectionCandidate
 
     private void handleMessage(Connection conn, string message)
     {
-        // This requires brutal reflection, but it's the only way to do it; since theres no "generics" here.
-        var packet = JObject.Parse(message);
-        var packetOpInt = packet["op"].Value<int>();
-        
-        // Check if the opcode is valid.
-        if (!Enum.IsDefined(typeof(OpCode), packetOpInt))
-            return;
-        
-        var opCode = (OpCode)packetOpInt;
-        if (!_hubs.ContainsKey(opCode))
-            return;
-        
-        // Parse the packet into a generic type, if possible.
-        int hubIdx = -1;
-        Packet? packetObj = null;
-        Hub? hub = null;
-        bool hasData = false;
-        foreach (var potentialHub in _hubs[opCode])
+        try
         {
-            hubIdx++;
-            
-            // Cast the packet into the hub's generic type.
-            var hubType = potentialHub.GetType();
-            Type? wantedType = null;
-            var genericTypes = hubType.BaseType.GetGenericArguments();
-            
-            // Find the generic type that we can JSON parse the packet data into.
-            foreach (var type in genericTypes)
+            // This requires brutal reflection, but it's the only way to do it; since theres no "generics" here.
+            var packet = JObject.Parse(message);
+            var packetOpInt = packet["op"].Value<int>();
+
+            // Check if the opcode is valid.
+            if (!Enum.IsDefined(typeof(OpCode), packetOpInt))
+                return;
+
+            var opCode = (OpCode)packetOpInt;
+            if (!_hubs.ContainsKey(opCode))
+                return;
+
+            // Parse the packet into a generic type, if possible.
+            int hubIdx = -1;
+            Packet? packetObj = null;
+            Hub? hub = null;
+            bool hasData = false;
+
+            foreach (var potentialHub in _hubs[opCode])
             {
-                if (packet.ToObject(type) != null)
+                hubIdx++;
+
+                // Cast the packet into the hub's generic type.
+                var hubType = potentialHub.GetType();
+                Type? wantedType = null;
+                var genericTypes = hubType.BaseType.GetGenericArguments();
+
+                // Find the generic type that we can JSON parse the packet data into.
+                foreach (var type in genericTypes)
                 {
-                    wantedType = type;
-                    break;
+                    if (packet.ToObject(type) != null)
+                    {
+                        wantedType = type;
+                        break;
+                    }
                 }
-            }
-            
-            if (wantedType == null)
-                continue;
-            
-            // Check if the hub expects data.
-            hasData = hubType.GetCustomAttribute<HubAttribute>()?.ExpectsData ?? false;
-                
-            if (potentialHub.ExpectsData && packet["d"] == null)
-                continue;
-            
-            // Parse the packet into the generic type.
-            packetObj = (Packet)packet.ToObject(wantedType);
-            hub = potentialHub;
-            break;
-        }
-        
-        if (hub == null || packetObj == null)
-            return;
 
-        // Invoke the hub's Handle method.
-        // Need to hackily use reflection to invoke Handle(Packet<T> packet).
-        var methods = hub.GetType().GetMethods();
-            
-        foreach (var method in methods)
-        {
-            if (method.Name != "Handle")
-                continue;
-                
-            var parameters = method.GetParameters();
-            if (parameters.Length < 1)
-                continue;
-            
-            if (hasData) {
-                var parameter = parameters[0];
-                if (parameter.ParameterType == typeof(Packet))
+                if (wantedType == null)
                     continue;
+
+                // Check if the hub expects data.
+                hasData = hubType.GetCustomAttribute<HubAttribute>()?.ExpectsData ?? false;
+
+                if (potentialHub.ExpectsData && packet["d"] == null)
+                    continue;
+
+                // Parse the packet into the generic type.
+                packetObj = (Packet)packet.ToObject(wantedType);
+                hub = potentialHub;
+                break;
             }
 
-            method.Invoke(hub, new [] { conn, (object)packetObj });
-            break;
+            if (hub == null || packetObj == null)
+                return;
+
+            // Invoke the hub's Handle method.
+            // Need to hackily use reflection to invoke Handle(Packet<T> packet).
+            var methods = hub.GetType().GetMethods();
+
+            foreach (var method in methods)
+            {
+                if (method.Name != "Handle")
+                    continue;
+
+                var parameters = method.GetParameters();
+                if (parameters.Length < 1)
+                    continue;
+
+                if (hasData)
+                {
+                    var parameter = parameters[0];
+                    if (parameter.ParameterType == typeof(Packet))
+                        continue;
+                }
+
+                method.Invoke(hub, new[] { conn, (object)packetObj });
+                break;
+            }
+        } catch (Exception ex)
+        {
+            // Probably a malformed packet.
+            return;
         }
     }
 
