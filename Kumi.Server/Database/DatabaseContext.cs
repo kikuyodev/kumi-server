@@ -7,6 +7,7 @@ namespace Kumi.Server.Database;
 public class DatabaseContext : DbContext
 {
     public DbSet<Account> Accounts { get; set; }
+    public DbSet<ChatChannel> ChatChannels { get; set; }
     
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {

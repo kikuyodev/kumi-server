@@ -24,6 +24,11 @@ public class QueueItem<T> : QueueItem
 public class QueueItem
 {
     /// <summary>
+    /// The raw data associated with this queue item.
+    /// </summary>
+    public string RawData { get; set; } = string.Empty;
+    
+    /// <summary>
     /// The queue processor that this item belongs to.
     /// </summary>
     [JsonIgnore]

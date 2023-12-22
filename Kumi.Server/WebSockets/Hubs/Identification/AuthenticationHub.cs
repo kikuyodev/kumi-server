@@ -1,8 +1,11 @@
-﻿using Kumi.Game.Online.Server;
+﻿using Kumi.Game.Online.API.Chat;
+using Kumi.Game.Online.Server;
 using Kumi.Game.Online.Server.Packets;
+using Kumi.Game.Online.Server.Packets.Dispatch;
 using Kumi.Server.Database;
 using Kumi.Server.Queues.Accounts;
 using Kumi.Server.Redis;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using osu.Framework.Allocation;
 using StackExchange.Redis;
@@ -31,7 +34,7 @@ public partial class AuthenticationHub : Hub<IdentifyPacket>
         if (position == -1)
             return;
         
-        cache.ListRemove("kumi.server:tokens", packet.Data.Token);
+        //cache.ListRemove("kumi.server:tokens", packet.Data.Token);
         var data = cache.StringGet($"kumi.server:tokens:{packet.Data.Token}");
         
         if (data.IsNullOrEmpty)
@@ -55,5 +58,25 @@ public partial class AuthenticationHub : Hub<IdentifyPacket>
                 Message = "Welcome to Kumi! Enjoy your stay!"
             }
         }.ToString());
+        
+        databaseContext.ChatChannels.ForEachAsync(x =>
+        {
+            // Send the account the channels they joined.
+            var isMember = cache.SetContains($"kumi.server:chat:{x.Id}:participants", account.Id);
+            
+            if (isMember)
+            {
+                conn.Send(new ChatChannelAddEvent()
+                {
+                    Data = new ChatChannelAddEvent.ChatChannelAddEventData()
+                    {
+                        Channel = new APIChatChannel()
+                        {
+                            Id = x.Id,
+                        }
+                    }
+                });
+            }
+        });
     }
 }

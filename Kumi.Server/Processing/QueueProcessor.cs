@@ -1,4 +1,5 @@
 using System.Reflection;
+using Kumi.Server.Database;
 using Kumi.Server.Redis;
 using Kumi.Server.WebSockets;
 using Newtonsoft.Json;
@@ -33,6 +34,12 @@ public abstract partial class QueueProcessor : IDependencyInjectionCandidate
     /// </summary>
     [Resolved]
     protected WebsocketServer WebsocketServer { get; private set; } = null!;
+    
+    /// <summary>
+    /// The PostgreSQL database context.
+    /// </summary>
+    [Resolved]
+    protected DatabaseContext Database { get; private set; } = null!;
 
     /// <summary>
     /// Pre-processes an item from the queue.
@@ -101,6 +108,7 @@ public abstract partial class QueueProcessor : IDependencyInjectionCandidate
         
         queueItem.Processor = this;
         queueItem.Queue = queueName;
+        queueItem.RawData = item.ToString();
         
         // Set the data property.
         dataProperty.SetValue(queueItem, data);
