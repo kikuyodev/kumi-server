@@ -108,6 +108,7 @@ public abstract partial class QueueProcessor : IDependencyInjectionCandidate
         
         queueItem.Processor = this;
         queueItem.Queue = queueName;
+        queueItem.RawData = item.ToString();
         
         // Set the data property.
         dataProperty.SetValue(queueItem, data);

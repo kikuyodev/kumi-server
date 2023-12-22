@@ -57,8 +57,22 @@ public class Connection : IDisposable
             
             packet.WriteByte(op);
             
+            if (serialized.Length <= 125)
+            {
+                packet.WriteByte((byte) serialized.Length);
+            }
+            else if (serialized.Length <= ushort.MaxValue)
+            {
+                packet.WriteByte(126);
+                packet.Write(intToByteArray((ushort) serialized.Length), 0, 2);
+            }
+            else
+            {
+                packet.WriteByte(127);
+                packet.Write(intToByteArray((ushort) serialized.Length), 0, 8);
+            }
+            
             var data = Encoding.UTF8.GetBytes(serialized);
-            packet.WriteByte((byte) data.Length);
             packet.Write(data, 0, data.Length);
             
             // Send the packet.

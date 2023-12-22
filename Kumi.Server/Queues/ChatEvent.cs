@@ -5,6 +5,18 @@ using Newtonsoft.Json;
 
 namespace Kumi.Server.Queues;
 
+public class ChatEvent<T> : QueueItem<ChatEvent<T>.ChatEventData<T>>
+{
+    public class ChatEventData<T> : ChatEvent.ChatEventData
+    {
+        /// <summary>
+        /// The data associated with this event.
+        /// </summary>
+        [JsonProperty("data")]
+        public T Data { get; set; }
+    }
+}
+
 public class ChatEvent : QueueItem<ChatEvent.ChatEventData>
 {
     public class ChatEventData 
@@ -26,5 +38,6 @@ public class ChatEvent : QueueItem<ChatEvent.ChatEventData>
         /// </summary>
         [JsonProperty("account")]
         public APIAccount Account { get; set; } 
+        
     }
 }
