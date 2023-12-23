@@ -73,6 +73,7 @@ public class Connection : IDisposable
             }
             
             var data = Encoding.UTF8.GetBytes(serialized);
+            // write data at correct index
             packet.Write(data, 0, data.Length);
             
             // Send the packet.

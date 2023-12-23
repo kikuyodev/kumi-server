@@ -1,4 +1,5 @@
-﻿using Kumi.Game.Online.API.Chat;
+﻿using System.Text.Json.Nodes;
+using Kumi.Game.Online.API.Chat;
 using Kumi.Game.Online.Server.Packets.Dispatch;
 using Kumi.Server.Processing;
 using Newtonsoft.Json;
@@ -16,7 +17,7 @@ public partial class ChatQueue : QueueProcessor
                 onJoin(chatEvent.Data);
                 break;
             
-            case "message":
+            case "message_create":
                 onMessage(turnEventIntoAnother<APIChatMessage>(chatEvent));
                 break;
         }
@@ -76,7 +77,7 @@ public partial class ChatQueue : QueueProcessor
                 Type = baseEvent.Data.Type,
                 Channel = baseEvent.Data.Channel,
                 Account = baseEvent.Data.Account,
-                Data = JsonConvert.DeserializeObject<T>(baseEvent.RawData)
+                Data = JsonConvert.DeserializeObject<T>(JsonObject.Parse(baseEvent.RawData)["data"].ToJsonString())
             }
         };
 
