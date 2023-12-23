@@ -147,7 +147,8 @@ public partial class WebsocketServer : IDependencyInjectionCandidate
     
     public IConnectionEnumerable GetConnections(Expression<Func<Connection, bool>> query)
     {
-        return new ConnectionList(Connections.Where(query.Compile()).ToList());
+        var conns = Connections.Where(query.Compile()).ToArray();
+        return new ConnectionList(conns);
     }
 
     private void handleMessage(Connection conn, string message)
